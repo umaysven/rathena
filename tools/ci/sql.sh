@@ -7,12 +7,12 @@ function aborterror {
 
 # Github Actions default login data
 DB_ROOT=root
-DB_ROOTPW=root
+DB_ROOTPW=satu2tiga
 # rAthena default MySQL data
 DB_HOST=localhost
-DB_NAME=ragnarok
-DB_USER=ragnarok
-DB_PASS=ragnarok
+DB_NAME=CUY_RO
+DB_USER=cuy_ro
+DB_PASS=cuy_ro_Satu2tiga
 
 mysql -u $DB_ROOT -p$DB_ROOTPW -e "CREATE DATABASE $DB_NAME;" || aborterror "Unable to create database."
 mysql -u $DB_ROOT -p$DB_ROOTPW $DB_NAME < sql-files/main.sql || aborterror "Unable to import main database."

@@ -69,28 +69,6 @@ int levenshtein(const std::string &s1, const std::string &s2)
 	return result;
 }
 
-bool rathena::util::safe_addition( int64 a, int64 b, int64& result ){
-#if __has_builtin( __builtin_add_overflow ) || ( defined( __GNUC__ ) && !defined( __clang__ ) && defined( GCC_VERSION  ) && GCC_VERSION >= 50100 )
-	return __builtin_add_overflow( a, b, &result );
-#else
-	bool overflow = false;
-
-	if( b < 0 ){
-		if( a < ( INT64_MIN - b ) ){
-			overflow = true;
-		}
-	}else{
-		if( a > ( INT64_MAX - b ) ){
-			overflow = true;
-		}
-	}
-
-	result = a + b;
-
-	return overflow;
-#endif
-}
-
 bool rathena::util::safe_substraction( int64 a, int64 b, int64& result ){
 #if __has_builtin( __builtin_sub_overflow ) || ( defined( __GNUC__ ) && !defined( __clang__ ) && defined( GCC_VERSION  ) && GCC_VERSION >= 50100 )
 	return __builtin_sub_overflow( a, b, &result );
@@ -135,4 +113,34 @@ bool rathena::util::safe_multiplication( int64 a, int64 b, int64& result ){
 
 	return false;
 #endif
+}
+
+void rathena::util::string_left_pad_inplace(std::string& str, char padding, size_t num)
+{
+	str.insert( 0, std::min( static_cast<size_t>( 0 ), num - str.length() ), padding );
+}
+
+std::string rathena::util::string_left_pad(const std::string& original, char padding, size_t num)
+{
+	return std::string( num - std::min( num, original.length() ), padding ) + original;
+}
+
+constexpr char base62_dictionary[] = {
+	'0', '1', '2', '3', '4', '5', '6', '7',
+	'8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
+	'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+	'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+	'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D',
+	'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+	'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+	'U', 'V', 'W', 'X', 'Y', 'Z'
+};
+
+std::string rathena::util::base62_encode( uint32 val ){
+	std::string result = "";
+	while (val != 0) {
+		result = base62_dictionary[(val % 62)] + result;
+		val /= 62;
+	}
+	return result;
 }

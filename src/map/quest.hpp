@@ -6,16 +6,17 @@
 
 #include <string>
 
-#include "../common/cbasetypes.hpp"
-#include "../common/database.hpp"
-#include "../common/strlib.hpp"
+#include <common/cbasetypes.hpp>
+#include <common/database.hpp>
+#include <common/strlib.hpp>
 
 #include "map.hpp"
 
-struct map_session_data;
+class map_session_data;
+enum e_size : uint8;
 
 struct s_quest_dropitem {
-	uint16 nameid;
+	t_itemid nameid;
 	uint16 count;
 	uint16 rate;
 	uint16 mob_id;
@@ -25,14 +26,23 @@ struct s_quest_dropitem {
 };
 
 struct s_quest_objective {
+	uint16 index;
 	uint16 mob_id;
 	uint16 count;
+	uint16 min_level, max_level;
+	e_race race;
+	e_size size;
+	e_element element;
+	int16 mapid;
+	std::string map_name;
+	std::vector<uint16> mobs_allowed;
 };
 
 struct s_quest_db {
 	int32 id;
 	time_t time;
 	bool time_at;
+	int32 time_week;
 	std::vector<std::shared_ptr<s_quest_objective>> objectives;
 	std::vector<std::shared_ptr<s_quest_dropitem>> dropitem;
 	std::string name;
@@ -47,26 +57,28 @@ enum e_quest_check_type : uint8 {
 
 class QuestDatabase : public TypesafeYamlDatabase<uint32, s_quest_db> {
 public:
-	QuestDatabase() : TypesafeYamlDatabase("QUEST_DB", 1) {
+	QuestDatabase() : TypesafeYamlDatabase("QUEST_DB", 3, 1) {
 
 	}
 
-	const std::string getDefaultLocation();
-	uint64 parseBodyNode(const YAML::Node& node);
+	const std::string getDefaultLocation() override;
+	uint64 parseBodyNode(const ryml::NodeRef& node) override;
+
+	// Additional
 	bool reload();
 };
 
 extern QuestDatabase quest_db;
 
-int quest_pc_login(struct map_session_data *sd);
+int quest_pc_login(map_session_data *sd);
 
-int quest_add(struct map_session_data *sd, int quest_id);
-int quest_delete(struct map_session_data *sd, int quest_id);
-int quest_change(struct map_session_data *sd, int qid1, int qid2);
+int quest_add(map_session_data *sd, int quest_id);
+int quest_delete(map_session_data *sd, int quest_id);
+int quest_change(map_session_data *sd, int qid1, int qid2);
 int quest_update_objective_sub(struct block_list *bl, va_list ap);
-void quest_update_objective(struct map_session_data *sd, int mob_id);
-int quest_update_status(struct map_session_data *sd, int quest_id, e_quest_state status);
-int quest_check(struct map_session_data *sd, int quest_id, e_quest_check_type type);
+void quest_update_objective(map_session_data *sd, struct mob_data* md);
+int quest_update_status(map_session_data *sd, int quest_id, e_quest_state status);
+int quest_check(map_session_data *sd, int quest_id, e_quest_check_type type);
 
 std::shared_ptr<s_quest_db> quest_search(int quest_id);
 

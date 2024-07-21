@@ -1,0 +1,66 @@
+//============================================================
+//= Automatic Buffs
+//===== By: ==================================================
+//= Nasagnilac
+//===== Current Version: =====================================
+//= 1
+//===== Compatible With: =====================================
+//= rAthena
+//===== Description: =========================================
+//= A npc where you can take a free buffs and heal depends on
+
+-	script	Auto_Buffs	FAKE_NPC,{
+
+OnInit:
+	set .lvreq, 50;		//- Character Level
+	set .viplvreq, 80;	//- VIP Level
+	set .bsec,900;		//- Automatic buffs will start every 900sec = 15 minutes
+	set .bdur,60;		//- Automatic buffs duration time in seconds 60sec = 1 minute
+	bindatcmd "ab", "Auto_Buffs::OnAtcommand", 0, 100;
+end;
+
+
+OnAtcommand:
+	if(getgroupid() == 4){
+		dispbottom "This account is not allowed to use the command.";
+		end;
+	}else if(BaseLevel > .lvreq){
+		dispbottom "Your level is to high for this command.";
+	}else{
+		if ( compare( .@atcmd_parameters$, "on" )) {
+			set @auto_buffs,1;
+			dispbottom "Auto Buffs is now enabled.";
+		}
+		else if ( compare( .@atcmd_parameters$, "off" )) {
+			set @auto_buffs,0;
+			dispbottom "Auto Buffs is now disabled.";
+		}
+		else {
+			dispbottom "Usage: @ab <on/off>";
+		}
+	}
+
+end;
+
+OnPCLoginEvent:
+OnReturn:
+	if(BaseLevel <= .lvreq || vip_status(VIP_STATUS_ACTIVE) && BaseLevel <= .viplvreq){
+		if(@auto_buffs){
+
+			if(!buffs_start){
+				specialeffect2 37; sc_start SC_INCREASEAGI,1000*.bdur,10;
+				specialeffect2 42; sc_start SC_BLESSING,1000*.bdur,10;
+			}
+
+			if(buffs_start >= .bsec){
+				set buffs_start, 0;
+			} else {
+				set buffs_start,buffs_start + 1;
+			}
+
+		}
+	}
+	sleep2 1000;
+	goto OnReturn;
+end;
+}

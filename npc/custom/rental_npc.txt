@@ -1,0 +1,46 @@
+//===== rAthena Script =======================================
+//= Rental NPC Support 3rd/4th job Suit Mado Gear and Dragon
+//===== By: ==================================================
+//= BeWan
+//===== Current Version: =====================================
+//= 1.0
+//===== Compatible With: =====================================
+//= rAthena Project
+//===== Description: =========================================
+//= A simple rental npc
+//===== Additional Comments: =================================
+//= 1.0 First version.
+//============================================================
+
+prontera,148,195,5	script	Universal Rental NPCx	469,{
+
+if(getskilllv("NC_MADOLICENCE") > 0 || getskilllv("RK_DRAGONTRAINING") > 0){
+
+if((Class == Job_Blacksmith || Class == Job_Whitesmith || Class == Job_Baby_Whitesmith) && checkcart() == 0 && getskilllv("NC_MADOLICENCE") > 0){
+	setmadogear;
+}else if(Class == Job_Lord_Knight || Class == Job_Baby_Knight && getskilllv("RK_DRAGONTRAINING") > 0){
+	setoption Option_Dragon1;
+	setriding;
+}
+
+}else{
+if((Class == Job_Hunter || Class == Job_Sniper) && checkfalcon() == 0 && getskilllv("HT_FALCON") > 0){
+	setfalcon;
+}else if((Class == Job_Merchant || Class == Job_Blacksmith || Class == Job_Whitesmith || Class == Job_Baby_Whitesmith || Class == Job_SuperNovice) && checkcart() == 0 && getskilllv("MC_PUSHCART") > 0){
+	setcart;
+}else if(checkriding() || checkfalcon() == 1 || checkcart() == 1){
+	npctalk "You already have a Cart / Falcon / Peco / Dragon.";
+	end;
+}else if(getskilllv("KN_RIDING") == 1){
+	setriding;
+}else{
+	npctalk "Sorry " + strcharinfo(0) + ", Please make sure you are the required job and have the required skill.";
+	end;
+}
+}
+
+}
+
+
+//Duplicate NPC
+morocc,155,83,5	duplicate(Universal Rental NPC)	Universal Rental NPC#custom1	469
